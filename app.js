@@ -1,12 +1,15 @@
 const express = require('express')
 
+const routes = require('./routes/ProductRoutes')
+const sequelize = require('./repository/database');
 const app = express()
-const PORT = 8080
+const PORT = 9090
 
-app.use('/', (req, res, next) => {
-    res.send("Hello world")
-})
+app.use(routes)
 
 app.listen(PORT, () => {
-    console.log(`Server started at ${PORT}`)
+    sequelize.authenticate().then(result => {
+        console.log("Database connected");
+        console.log(`Server started at ${PORT}`);
+    }).catch(err => console.log(err));
 })
