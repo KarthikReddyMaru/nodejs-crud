@@ -1,5 +1,9 @@
-const { Sequelize} = require('sequelize')
+const { Sequelize } = require('sequelize')
 
+/**
+ *
+ * @param {import('./index').sequelize} sequelize
+ */
 module.exports = (sequelize) => {
 
     return sequelize.define('cart_item', {

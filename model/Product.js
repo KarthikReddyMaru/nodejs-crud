@@ -1,5 +1,9 @@
 const Sequelize = require('sequelize')
 
+/**
+ *
+ * @param {import('./index').sequelize} sequelize
+ */
 module.exports = (sequelize) => {
 
     const Product = sequelize.define('product', {
@@ -23,10 +27,22 @@ module.exports = (sequelize) => {
         }
     })
 
+    /**
+     *
+     * @param {import('./index').Models} models
+     */
     Product.associate = (models) => {
+
         Product.belongsToMany(models.Cart, {
-            through: models.Cart_Item,
+            through: models.CartItem,
             as: 'carts',
+            foreignKey: 'product_id',
+            onDelete: 'SET NULL'
+        })
+
+        Product.belongsToMany(models.Order, {
+            through: models.OrderItem,
+            as: 'orders',
             foreignKey: 'product_id',
             onDelete: 'SET NULL'
         })
