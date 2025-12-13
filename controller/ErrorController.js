@@ -11,6 +11,7 @@ exports.errorHandler = (err, req, res, next) => {
     let status = 500;
     if (err instanceof ErrorResponse)
         status = err.status;
+    console.error(err.stack)
     return res.status(status)
         .json({
             "path": req.path,

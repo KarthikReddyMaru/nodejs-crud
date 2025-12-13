@@ -11,6 +11,10 @@ module.exports = (sequelize) => {
             type: Sequelize.UUID,
             defaultValue: Sequelize.UUIDV4,
             primaryKey: true
+        },
+        quantity: {
+            type: Sequelize.INTEGER,
+            defaultValue: 1
         }
     });
 }
