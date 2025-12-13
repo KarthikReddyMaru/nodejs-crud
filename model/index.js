@@ -23,9 +23,6 @@ const OrderItem = require('./OrderItem')(sequelize);
  * @property {typeof OrderItem} OrderItem
  */
 
-/**
- * @type {Models}
- */
 const models = { Product, Cart, CartItem, User, Order, OrderItem }
 
 Object

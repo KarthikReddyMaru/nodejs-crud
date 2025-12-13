@@ -1,6 +1,7 @@
 const express = require('express')
 
-const routes = require('./routes/ProductRoutes')
+const productRoutes = require('./routes/ProductRoutes')
+const authenticationRoutes = require('./routes/AuthenticationRoutes')
 const { sequelize } = require('./model/index');
 const {errorHandler} = require("./controller/ErrorController");
 
@@ -10,7 +11,8 @@ const PORT = 9090
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 
-app.use(routes)
+app.use(authenticationRoutes)
+app.use(productRoutes)
 
 app.use(errorHandler)
 
@@ -21,6 +23,6 @@ app.listen(PORT, async () => {
     await sequelize.authenticate();
     console.log("Database connected");
 
-    await sequelize.sync({force: true});
+    await sequelize.sync({});
     console.log("Tables synced");
 })
