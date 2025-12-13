@@ -20,11 +20,9 @@
   },
   "dependencies": {
     "express": "^5.2.1",
-    "mysql2": "^3.15.3",
-    "sequelize": "^6.37.7"
+    "mongodb": "^7.0.0"
   },
   "devDependencies": {
-    "@types/sequelize": "^4.28.20",
     "nodemon": "^3.1.11"
   }
 }
