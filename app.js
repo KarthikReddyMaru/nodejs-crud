@@ -1,7 +1,7 @@
 const express = require('express')
 
 const routes = require('./routes/ProductRoutes')
-const sequelize = require('./repository/database');
+const { sequelize } = require('./model/index');
 const {errorHandler} = require("./controller/ErrorController");
 
 const app = express()
@@ -21,6 +21,6 @@ app.listen(PORT, async () => {
     await sequelize.authenticate();
     console.log("Database connected");
 
-    await sequelize.sync();
+    await sequelize.sync({force: true});
     console.log("Tables synced");
 })

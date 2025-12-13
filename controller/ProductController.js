@@ -1,6 +1,6 @@
 const express = require('express')
 
-const Product = require('../model/Product')
+const { Product } = require('../model/index').models
 const ErrorResponse = require("../util/ErrorResponse");
 
 /**
