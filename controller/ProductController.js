@@ -9,6 +9,26 @@ const ErrorResponse = require("../util/ErrorResponse");
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
+exports.getProductsByPage = async (req, res, next) => {
+    const page = Math.max(parseInt(req.query.page ?? '1', 10), 1);
+    const size = Math.min(parseInt(req.query.size ?? '10', 10), 10);
+    const products = await Product.findAndCountAll({
+        attributes: ['id', 'name', 'price', 'quantity'],
+        order: [['createdAt', 'DESC']],
+        limit: size,
+        offset: (page - 1) * size
+    })
+    return res.json({
+        data: products.rows,
+        count: products.count
+    })
+}
+
+/**
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
 exports.getProductById = async (req, res, next) => {
     const productId = req.params.id;
     try {
