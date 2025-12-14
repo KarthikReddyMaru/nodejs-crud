@@ -1,10 +1,15 @@
 const express = require('express')
 
-const routes = require('./routes/ProductRoutes')
 const app = express()
 const PORT = 9090
 
-app.use(routes)
+const productRoutes = require('./routes/ProductRoutes')
+const errorHandler = require('./controller/ErrorController')
+
+app.use(express.json())
+
+app.use(productRoutes)
+app.use(errorHandler)
 
 app.listen(PORT, () => {
     console.log(`Server started at ${PORT}`);
