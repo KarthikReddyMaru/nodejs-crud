@@ -43,8 +43,40 @@ exports.saveProduct = async (req, res, next) => {
             price: price,
             quantity: quantity
         })
+    } catch (e) {
+        next(e);
     }
-    catch (e) {
+}
+
+/**
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+exports.updateProduct = async (req, res, next) => {
+    const {id, name, price, quantity} = req.body;
+    const product = new Product(id, name, price, quantity);
+    try {
+        const updatedProduct = await product.update();
+        return res.status(201).json(updatedProduct);
+    } catch (e) {
+        next(e);
+    }
+}
+
+/**
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+exports.deleteProductById = async (req, res, next) => {
+    const id = req.params.id;
+    try {
+        await Product.deleteById(id);
+        return res.sendStatus(204);
+    } catch (e) {
         next(e);
     }
 }

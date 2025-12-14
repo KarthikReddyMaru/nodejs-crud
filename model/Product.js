@@ -19,8 +19,7 @@ module.exports = class Product {
     }
 
     static findById = async (id) => {
-        if (id && !ObjectId.isValid(id))
-            throw new ErrorResponse('Invalid object Id', 400);
+
         const client = await mongoConnect;
         return await client
             .db(database)
@@ -47,5 +46,25 @@ module.exports = class Product {
         const db = client.db(database).collection(productsCollection);
         const {acknowledged, insertedId} = await db.insertOne(this);
         return acknowledged ? insertedId : undefined;
+    }
+
+    async update() {
+        const client = await mongoConnect;
+        const {_id, ...updates} = this
+        const db = client
+            .db(database)
+            .collection(productsCollection);
+        return await db
+            .findOneAndUpdate({ _id: _id }, { $set: updates }, { returnDocument: 'after', upsert: false })
+    }
+
+    static deleteById = async (id) => {
+        if (id && !ObjectId.isValid(id))
+            throw new ErrorResponse('Invalid object Id', 400);
+        const client = await mongoConnect;
+        await client
+            .db(database)
+            .collection(productsCollection)
+            .deleteOne({_id: new ObjectId(id)});
     }
 }
