@@ -7,9 +7,23 @@ const Product = require("../model/Product");
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
-exports.getProductById = (req, res, next) => {
+exports.getProductsByPage = async (req, res, next) => {
+    const page = req.query.page;
+    const size = req.query.size;
+    const products = await Product.find(page, size);
+    return res.status(200).send(products)
+}
+
+/**
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+exports.getProductById = async (req, res, next) => {
     const productId = req.params.id;
-    res.status(200).send(`Product ${productId}`)
+    const product = await Product.findById(productId)
+    res.status(200).send(product)
 }
 
 /**

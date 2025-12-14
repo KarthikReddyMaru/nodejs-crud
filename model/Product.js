@@ -18,6 +18,30 @@ module.exports = class Product {
         this.quantity = quantity;
     }
 
+    static findById = async (id) => {
+        if (id && !ObjectId.isValid(id))
+            throw new ErrorResponse('Invalid object Id', 400);
+        const client = await mongoConnect;
+        return await client
+            .db(database)
+            .collection(productsCollection)
+            .findOne({_id: new ObjectId(id)})
+    }
+
+    static find = async (page, size) => {
+        page = Math.max(1, parseInt(page ?? '1', 10))
+        size = Math.min(10, parseInt(size ?? '10', 10))
+        const client = await mongoConnect
+        return await client
+            .db(database)
+            .collection(productsCollection)
+            .find()
+            .sort({_id: "ascending"})
+            .skip((page - 1) * size)
+            .limit(size)
+            .toArray();
+    }
+
     async save() {
         const client = await mongoConnect;
         const db = client.db(database).collection(productsCollection);
