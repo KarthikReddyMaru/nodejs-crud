@@ -10,26 +10,39 @@ const ErrorResponse = require("../util/ErrorResponse");
  * @param {import('express').Response} res
  * @param {import('express').NextFunction} next
  */
-exports.dummyAuth = async (req, res, next) => {
+exports.basicAuth = async (req, res, next) => {
     try {
-        const user = await User.findOne({}, {}, {lean: true});
-        if (!user) {
-            crypto.randomBytes(32, (err, buf) => {
-                const password = buf.toString('base64');
-                return bcrypt.hash(password, 12)
-                    .then(hashedPassword => {
-                        return User.create({
-                            email: 'test@test.com',
-                            password: hashedPassword
-                        });
-                    }).then(user => {
-                        req.user = user;
-                    })
-                    .catch(e => next(e));
-            });
-        } else req.user = user;
-        next();
+        const authHeader = req.get('Authorization');
+        if (!authHeader) { return next(new ErrorResponse('Unauthenticated', 401)); }
+        const encodedCredentials = authHeader.split(' ')[1];
+        const [email, password] = Buffer.from(encodedCredentials, 'base64').toString('utf8').split(':');
+        const user = await User.findOne({ email: email }, 'password', {lean: true});
+        console.log(user);
+        if (!user || !(await bcrypt.compare(password, user.password)))
+            return next(new ErrorResponse('Unauthenticated', 401));
+
+        return res.sendStatus(200);
     } catch (e) {
-        next(new ErrorResponse('User creation failed', 500));
+        next(e);
+    }
+}
+
+/**
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+exports.register = async (req, res, next) => {
+    try {
+        const {email, password} = req.body;
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const user = await User.create({ email, password: hashedPassword });
+        return res.status(201).json(user);
+    } catch (e) {
+        console.log(e)
+        if (e && e.code === 11000)
+            e.message = 'Email already exists!';
+        next(e);
     }
 }

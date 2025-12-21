@@ -7,8 +7,8 @@ const PORT = 9090
 
 app.use(express.json())
 
-const { dummyAuth } = require("./controller/AuthController");
-app.use(dummyAuth);
+const authRoutes = require("./routes/AuthRoutes");
+app.use("/auth", authRoutes);
 
 const productRoutes = require('./routes/ProductRoutes')
 app.use("/products", productRoutes)
