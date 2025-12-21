@@ -1,14 +1,22 @@
 const express = require('express')
+require('./model/index')
 
 const app = express()
 const PORT = 9090
 
-const productRoutes = require('./routes/ProductRoutes')
-const errorHandler = require('./controller/ErrorController')
 
 app.use(express.json())
 
-app.use(productRoutes)
+const { dummyAuth } = require("./controller/AuthController");
+app.use(dummyAuth);
+
+const productRoutes = require('./routes/ProductRoutes')
+app.use("/products", productRoutes)
+
+const cartRoutes = require('./routes/CartRoutes')
+app.use("/cart", cartRoutes);
+
+const errorHandler = require('./controller/ErrorController')
 app.use(errorHandler)
 
 app.listen(PORT, () => {
