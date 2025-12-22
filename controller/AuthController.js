@@ -19,7 +19,14 @@ exports.basicAuth = async (req, res, next) => {
         const user = await User.findOne({ email: email }, 'password', {lean: true});
         if (!user || !(await bcrypt.compare(password, user.password)))
             return next(new ErrorResponse('Unauthenticated', 401));
-        req.session.user = {_id: user._id};
+        const csrfToken = await new Promise((resolve, reject) => {
+            crypto.randomBytes(32, (err, buf) => {
+                if (!err)
+                    return resolve(buf.toString('hex'));
+                return reject(err);
+            });
+        });
+        req.session.user = {_id: user._id, csrf: csrfToken};
         return res.status(200).json({success: 'true'});
     } catch (e) {
         next(e);
