@@ -1,7 +1,5 @@
 const express = require('express')
 const productController = require("../controller/ProductController");
-const {authValidate, csrfValidate} = require("../validation/AuthValidator");
-
 
 const router = express.Router()
 

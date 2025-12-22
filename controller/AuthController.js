@@ -41,9 +41,10 @@ exports.basicAuth = async (req, res, next) => {
  */
 exports.register = async (req, res, next) => {
     try {
+        const role = req.query.role;
         const {email, password} = req.body;
         const hashedPassword = await bcrypt.hash(password, 12);
-        const user = await User.create({ email, password: hashedPassword });
+        const user = await User.create({ email, password: hashedPassword, role: role });
         return res.status(201).json(user);
     } catch (e) {
         console.log(e)

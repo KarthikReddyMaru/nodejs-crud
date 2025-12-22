@@ -11,6 +11,11 @@ const userSchema = new Schema({
         type: String,
         required: true,
         select: false
+    },
+    role: {
+        type: String,
+        enum: ['consumer', 'producer'],
+        default: 'consumer'
     }
 });
 
