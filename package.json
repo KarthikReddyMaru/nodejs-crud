@@ -15,19 +15,13 @@
   "type": "commonjs",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
-    "debug": "nodemon --inspect app.js",
+    "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "connect-mongo": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "express-session": "^1.18.2",
-    "mongodb": "^7.0.0",
-    "mongoose": "^9.0.1"
+    "mongodb": "^7.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

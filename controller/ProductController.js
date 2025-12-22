@@ -1,52 +1,44 @@
+const express = require('express')
 const Product = require("../model/Product");
-const ErrorResponse = require("../util/ErrorResponse");
 
 /**
  *
- * @param {import('express').Request} req
- * @param {import('express').Response} res
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
  */
-exports.getProductsByPage = async (req, res) => {
-    const page = Math.max(parseInt(req.query.page ?? '1', 10), 1);
-    const size = Math.max(parseInt(req.query.size ?? '10', 10), 1);
-    const products = await Product.find({}, "-_id -__v", {
-        lean: true,
-        sort: {name: 1},
-        limit: size,
-        skip: (page - 1) * size,
-    })
-    console.log(req.session);
+exports.getProductsByPage = async (req, res, next) => {
+    const page = req.query.page;
+    const size = req.query.size;
+    const products = await Product.find(page, size);
     return res.status(200).send(products)
 }
 
 /**
  *
- * @param {import('express').Request} req
- * @param {import('express').Response} res
- * @param {import('express').NextFunction} next
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
  */
 exports.getProductById = async (req, res, next) => {
     const productId = req.params.id;
-    const product = await Product
-        .findById(productId, "-__v", { lean: true })
-    if (!product)
-        return next(new ErrorResponse('No product found', 404))
+    const product = await Product.findById(productId)
     res.status(200).send(product)
 }
 
 /**
  *
- * @param {import('express').Request} req
- * @param {import('express').Response} res
- * @param {import('express').NextFunction} next
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
  */
 exports.saveProduct = async (req, res, next) => {
+    const {id, name, price, quantity} = req.body;
+    const product = new Product(id, name, price, quantity);
     try {
-        const {name, price, quantity} = req.body;
-        const document = await Product.create([{name, price, quantity}]);
-        if (!document) return next(new ErrorResponse('Failed to create product', 500))
+        const documentId = await product.save();
         return res.status(201).json({
-            id: document._id,
+            id: documentId,
             name: name,
             price: price,
             quantity: quantity
@@ -58,24 +50,16 @@ exports.saveProduct = async (req, res, next) => {
 
 /**
  *
- * @param {import('express').Request} req
- * @param {import('express').Response} res
- * @param {import('express').NextFunction} next
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
  */
 exports.updateProduct = async (req, res, next) => {
-    const id = req.body.id;
-    const {name, price, quantity} = req.body;
+    const {id, name, price, quantity} = req.body;
+    const product = new Product(id, name, price, quantity);
     try {
-        const product = await Product
-            .findByIdAndUpdate(
-                id,
-                {name, price, quantity},
-                {
-                    new: true,
-                    upsert: false
-                }
-            )
-        return res.status(201).json(product);
+        const updatedProduct = await product.update();
+        return res.status(201).json(updatedProduct);
     } catch (e) {
         next(e);
     }
@@ -83,14 +67,14 @@ exports.updateProduct = async (req, res, next) => {
 
 /**
  *
- * @param {import('express').Request} req
- * @param {import('express').Response} res
- * @param {import('express').NextFunction} next
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
  */
 exports.deleteProductById = async (req, res, next) => {
     const id = req.params.id;
     try {
-        await Product.findByIdAndDelete(id, {});
+        await Product.deleteById(id);
         return res.sendStatus(204);
     } catch (e) {
         next(e);

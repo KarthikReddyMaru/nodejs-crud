@@ -11,7 +11,6 @@ module.exports = (err, req, res, next) => {
     let status = 500;
     if (err instanceof ErrorResponse)
         status = err.status;
-    console.log(err.stack)
     return res.status(status).json({
         path: req.path,
         message: err.message,
