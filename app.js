@@ -1,6 +1,7 @@
 const express = require('express')
 const session = require('express-session')
-require('./model/index')
+const MongoStore = require("connect-mongo").default;
+const MONGO_URI = require('./model/index')
 
 const app = express()
 const PORT = 9090
@@ -10,7 +11,18 @@ app.use(express.json())
 app.use(session({
     secret:SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: MONGO_URI + 'ecom',
+        collectionName: 'sessions',
+        ttl: 24 * 60 * 60,
+        autoRemove: 'native',
+    }),
+    cookie: {
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 1000,
+        httpOnly: true
+    }
 }))
 
 const authRoutes = require("./routes/AuthRoutes");

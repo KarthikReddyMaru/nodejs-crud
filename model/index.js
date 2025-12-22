@@ -17,3 +17,5 @@ mongoose.connect(uri, {
     console.log(e)
     process.exit(1);
 })
+
+module.exports = uri;
