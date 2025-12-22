@@ -3,12 +3,16 @@ const express = require('express')
 const app = express()
 const PORT = 9090
 
-const productRoutes = require('./routes/ProductRoutes')
-const errorHandler = require('./controller/ErrorController')
 
 app.use(express.json())
 
-app.use(productRoutes)
+const authRoutes = require('./routes/AuthRoutes');
+app.use("/auth", authRoutes)
+
+const productRoutes = require('./routes/ProductRoutes')
+app.use("/products", productRoutes)
+
+const errorHandler = require('./controller/ErrorController')
 app.use(errorHandler)
 
 app.listen(PORT, () => {
