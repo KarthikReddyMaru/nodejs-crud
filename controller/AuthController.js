@@ -16,7 +16,7 @@ exports.basicAuth = async (req, res, next) => {
         if (!authHeader) { return next(new ErrorResponse('Unauthenticated', 401)); }
         const encodedCredentials = authHeader.split(' ')[1];
         const [email, password] = Buffer.from(encodedCredentials, 'base64').toString('utf8').split(':');
-        const user = await User.findOne({ email: email }, 'password', {lean: true});
+        const user = await User.findOne({ email: email }, 'role password', {lean: true});
         if (!user || !(await bcrypt.compare(password, user.password)))
             return next(new ErrorResponse('Unauthenticated', 401));
         const csrfToken = await new Promise((resolve, reject) => {
@@ -26,7 +26,8 @@ exports.basicAuth = async (req, res, next) => {
                 return reject(err);
             });
         });
-        req.session.user = {_id: user._id, csrf: csrfToken};
+        console.log(`user - ${email} - CSRF - ${csrfToken}`);
+        req.session.user = {_id: user._id, role: user.role, csrf: csrfToken};
         return res.status(200).json({success: 'true'});
     } catch (e) {
         next(e);
