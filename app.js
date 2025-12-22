@@ -1,11 +1,17 @@
 const express = require('express')
+const session = require('express-session')
 require('./model/index')
 
 const app = express()
 const PORT = 9090
-
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
 app.use(express.json())
+app.use(session({
+    secret:SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}))
 
 const authRoutes = require("./routes/AuthRoutes");
 app.use("/auth", authRoutes);

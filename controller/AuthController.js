@@ -17,11 +17,10 @@ exports.basicAuth = async (req, res, next) => {
         const encodedCredentials = authHeader.split(' ')[1];
         const [email, password] = Buffer.from(encodedCredentials, 'base64').toString('utf8').split(':');
         const user = await User.findOne({ email: email }, 'password', {lean: true});
-        console.log(user);
         if (!user || !(await bcrypt.compare(password, user.password)))
             return next(new ErrorResponse('Unauthenticated', 401));
-
-        return res.sendStatus(200);
+        req.session.user = {_id: user._id};
+        return res.status(200).json({success: 'true'});
     } catch (e) {
         next(e);
     }
@@ -45,4 +44,27 @@ exports.register = async (req, res, next) => {
             e.message = 'Email already exists!';
         next(e);
     }
+}
+
+/**
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+exports.logout = async (req, res, next) => {
+    const session = req.session;
+    try {
+        if (session) {
+            await new Promise((resolve, reject) => {
+                session.destroy((err) => {
+                    if (err)
+                        return reject(err);
+                    return resolve();
+                });
+            });
+        }
+        res.clearCookie('connect-sid');
+        return res.status(200).json({success: true});
+    } catch (e) { return next(new ErrorResponse('logout failed', 500)); }
 }

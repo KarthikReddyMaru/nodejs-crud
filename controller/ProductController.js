@@ -15,6 +15,7 @@ exports.getProductsByPage = async (req, res) => {
         limit: size,
         skip: (page - 1) * size,
     })
+    console.log(req.session);
     return res.status(200).send(products)
 }
 
@@ -29,7 +30,7 @@ exports.getProductById = async (req, res, next) => {
     const product = await Product
         .findById(productId, "-__v", { lean: true })
     if (!product)
-        return next(ErrorResponse('No product found', 404))
+        return next(new ErrorResponse('No product found', 404))
     res.status(200).send(product)
 }
 
